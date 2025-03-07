@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Dashboard</h1>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card users h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Usuários</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="display-4 me-3">{{ stats.total_users }}</div>
+                        <div>
+                            <div>Total de Usuários</div>
+                            <div class="text-success">{{ stats.vip_users }} VIP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card payments h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Pagamentos</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="display-4 me-3">{{ stats.total_payments }}</div>
+                        <div>
+                            <div>Total de Pagamentos</div>
+                            <div class="text-success">{{ stats.approved_payments }} Aprovados</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card revenue h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Receita</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="display-4 me-3">R$</div>
+                        <div>
+                            <div class="display-6">{{ "%.2f"|format(stats.total_revenue) }}</div>
+                            <div class="text-success">Total Arrecadado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Taxa de Conversão</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="display-4 me-3">{{ "%.1f"|format(stats.approved_payments / stats.total_payments * 100 if stats.total_payments > 0 else 0) }}%</div>
+                        <div>
+                            <div>Pagamentos Aprovados</div>
+                            <div class="text-success">Sobre Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Pagamentos por Dia (Últimos 30 dias)</h5>
+                </div>
+                <div class="card-body">
+                    {% if payment_chart %}
+                        <img src="data:image/png;base64,{{ payment_chart }}" class="img-fluid" alt="Pagamentos por Dia">
+                    {% else %}
+                        <div class="alert alert-info">Não há dados suficientes para gerar o gráfico.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Receita por Dia (Últimos 30 dias)</h5>
+                </div>
+                <div class="card-body">
+                    {% if revenue_chart %}
+                        <img src="data:image/png;base64,{{ revenue_chart }}" class="img-fluid" alt="Receita por Dia">
+                    {% else %}
+                        <div class="alert alert-info">Não há dados suficientes para gerar o gráfico.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Payments -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Pagamentos Recentes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in stats.recent_payments %}
+                                <tr>
+                                    <td>{{ payment.username or payment.first_name }}</td>
+                                    <td>R$ {{ "%.2f"|format(payment.amount) }}</td>
+                                    <td>
+                                        {% if payment.status == 'approved' %}
+                                            <span class="badge bg-success">Aprovado</span>
+                                        {% elif payment.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">Pendente</span>
+                                        {% elif payment.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejeitado</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ payment.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ payment.updated_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

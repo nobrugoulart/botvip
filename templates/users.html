@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Usuários</h1>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Lista de Usuários</h5>
+            <div>
+                <input type="text" id="userSearch" class="form-control" placeholder="Buscar usuário...">
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Username</th>
+                            <th>Status VIP</th>
+                            <th>Data de Expiração</th>
+                            <th>Último Pagamento</th>
+                            <th>Status do Pagamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.user_id }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.username or 'N/A' }}</td>
+                            <td>
+                                {% if user.is_vip %}
+                                    <span class="badge bg-success">VIP</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Regular</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.expiry_date %}
+                                    {{ user.expiry_date }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.payment_date %}
+                                    {{ user.payment_date }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.payment_status == 'approved' %}
+                                    <span class="badge bg-success">Aprovado</span>
+                                {% elif user.payment_status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                {% elif user.payment_status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejeitado</span>
+                                {% elif user.payment_status %}
+                                    <span class="badge bg-secondary">{{ user.payment_status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('user_details', user_id=user.user_id) }}" class="btn btn-sm btn-outline-primary">Detalhes</a>
+                                    {% if user.is_vip %}
+                                        <a href="{{ url_for('user_details', user_id=user.user_id) }}" class="btn btn-sm btn-outline-danger">Gerenciar VIP</a>
+                                    {% else %}
+                                        <a href="{{ url_for('user_details', user_id=user.user_id) }}" class="btn btn-sm btn-outline-success">Conceder VIP</a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('userSearch');
+        const table = document.getElementById('usersTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        searchInput.addEventListener('keyup', function() {
+            const query = searchInput.value.toLowerCase();
+            
+            for (let i = 0; i < rows.length; i++) {
+                const username = rows[i].getElementsByTagName('td')[2].textContent.toLowerCase();
+                const name = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+                const userId = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+                
+                if (username.includes(query) || name.includes(query) || userId.includes(query)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

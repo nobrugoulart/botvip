@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h2 mb-4">Configurações</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Configurações do Bot</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('settings') }}">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="payment_amount" class="form-label">Valor do Pagamento (R$)</label>
+                        <input type="number" class="form-control" id="payment_amount" name="payment_amount" value="{{ config.PAYMENT_AMOUNT }}" step="0.01" min="0.01" required>
+                        <div class="form-text">Valor cobrado para acesso VIP</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="vip_duration" class="form-label">Duração do VIP (dias)</label>
+                        <input type="number" class="form-control" id="vip_duration" name="vip_duration" value="30" min="1" required>
+                        <div class="form-text">Duração do acesso VIP após pagamento</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="vip_group_id" class="form-label">ID do Grupo VIP</label>
+                        <input type="text" class="form-control" id="vip_group_id" name="vip_group_id" value="{{ config.VIP_GROUP_ID }}" required>
+                        <div class="form-text">ID do grupo do Telegram para acesso VIP</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="admin_user_id" class="form-label">ID do Administrador</label>
+                        <input type="text" class="form-control" id="admin_user_id" name="admin_user_id" value="{{ config.ADMIN_USER_ID }}" required>
+                        <div class="form-text">ID do usuário administrador do bot</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="mercadopago_token" class="form-label">Token do MercadoPago</label>
+                        <input type="text" class="form-control" id="mercadopago_token" name="mercadopago_token" value="{{ config.MERCADOPAGO_ACCESS_TOKEN }}" required>
+                        <div class="form-text">Token de acesso da sua conta MercadoPago</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="webhook_url" class="form-label">URL de Webhook para Notificações</label>
+                        <input type="url" class="form-control" id="webhook_url" name="webhook_url" value="{{ config.WEBHOOK_URL or '' }}">
+                        <div class="form-text">URL para receber notificações de pagamento do MercadoPago (opcional)</div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Configurações do Painel Admin</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('settings') }}">
+                <input type="hidden" name="form_type" value="admin_settings">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="admin_username" class="form-label">Nome de Usuário Admin</label>
+                        <input type="text" class="form-control" id="admin_username" name="admin_username" value="{{ config.ADMIN_USERNAME }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="admin_password" class="form-label">Nova Senha Admin</label>
+                        <input type="password" class="form-control" id="admin_password" name="admin_password" placeholder="Deixe em branco para manter a atual">
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Atualizar Credenciais</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
