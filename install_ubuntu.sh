@@ -31,8 +31,46 @@ check_command git
 
 # Create and activate virtual environment
 echo "Setting up Python virtual environment..."
-python3 -m venv venv
-source venv/bin/activate
+
+# Check if we have write permissions to the current directory
+if [ ! -w "$(pwd)" ]; then
+    echo "Warning: You don't have write permissions to $(pwd)"
+    echo "Choose an option:"
+    echo "1. Create virtual environment in your home directory"
+    echo "2. Try to fix permissions for the current directory"
+    echo "3. Specify a different directory for the virtual environment"
+    read -p "Enter your choice (1-3): " venv_choice
+    
+    case $venv_choice in
+        1)
+            VENV_PATH="$HOME/botvip_venv"
+            echo "Creating virtual environment in $VENV_PATH"
+            python3 -m venv "$VENV_PATH"
+            source "$VENV_PATH/bin/activate"
+            ;;
+        2)
+            echo "Attempting to fix permissions for $(pwd)"
+            sudo chown -R $USER:$USER $(pwd)
+            echo "Creating virtual environment in current directory"
+            python3 -m venv venv
+            source venv/bin/activate
+            ;;
+        3)
+            read -p "Enter the path for the virtual environment: " custom_path
+            echo "Creating virtual environment in $custom_path"
+            python3 -m venv "$custom_path"
+            source "$custom_path/bin/activate"
+            ;;
+        *)
+            echo "Invalid choice. Exiting."
+            exit 1
+            ;;
+    esac
+else
+    # We have write permissions, proceed normally
+    python3 -m venv venv
+    source venv/bin/activate
+fi
 
 # Upgrade pip and install wheel
 pip install --upgrade pip wheel
